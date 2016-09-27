@@ -1,44 +1,30 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    HandOfTheEmpiror.ships.doc.txt                     :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: khansman <marvin@42.fr>                    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2016/09/22 17:56:17 by khansman          #+#    #+#              #
-#    Updated: 2016/09/22 17:56:21 by khansman         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+<- Fact ------------------------------------------------------------------------
 
-<- Ships -----------------------------------------------------------------------
+The Fact class is designed to handle the management of dependency and
+annullment rules of a Fact defined for a backward chaining inference engine.
 
-HandOfTheEmpiror is a child class of Ships.
-
-The class differs by setting HandOfTheEmpiror defult vessile stats automatically.
-For more details read the documentation on the Ships class. 
+Instantiation of a Fact requires the name of the Fact to passed to the
+constructor.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Default vessel stats:
-	Name: "Hand Of The Emperor"
-	Size: 1x4 cases
-	Hull points: 5
-	PP: 10
-	Speed: 15
-	Handling: 4
-	Bouclier : 0
-	Weapons: Nautical Lance
+Methods:
 
-The vessile is by default reporsented to be a size of (1x;4y)units.
-If no position is given, then the vessile will land up being placed randomly on
-the map.
+bool prove($Facts)
+-The prove method is used to determine whether a fact is true under the
+curently defined rules and constants. It will return true or false depending
+on the rules it was given using the methods c_depend and c_anull and the list
+of Fact Objects given in the $Facts variable.
+Note: This method works recursively through the defined rules of the objects in
+order to resolve the query for the initial fact.
 
-Upon creation the vessile's position (int), angle (nesw), and velocity (int) 
-can be set by passing through to it a keyed array containing the required
-details.
+c_depend($string)
+-This method appends $string to the Fact Object's list of rules which it can
+attempt to resolve in order to prove itself as TRUE.
 
-If incorrect paramiters are passed to the constructor, then the vessile's
-behavior is undefined.
+c_anull($string)
+-This method appends $string to the Fact Object's list of rules which is can
+attempt to resolve in order to prove itself as FALSE.
 
-© khansman
------------------------------------------------------------------------ Ships ->
+author: ghavenga, bsaunder
+------------------------------------------------------------------------ Fact ->
