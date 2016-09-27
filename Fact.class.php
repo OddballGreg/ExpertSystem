@@ -5,7 +5,7 @@
 
 		/* Variables */
 
-		static public $verbose = 0;
+		static public $verbose = 1;
 		private $_name = NULL;
 		private $_dependencies = NULL;
 
@@ -39,6 +39,12 @@
 
 		public function prove($facts) 
 		{
+			if (self::$verbose == TRUE)
+			{
+				print("Attempting to prove Fact " . $this . "using the following conditions:" . PHP_EOL);
+				foreach ($facts as $fact)
+					print($fact . PHP_EOL);
+			}
 		}
 	}
 ?>
