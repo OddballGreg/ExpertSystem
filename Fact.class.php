@@ -13,8 +13,9 @@
 
 		/*Standard Basic Methods*/
 		
-		function __construct() 
+		function __construct($name) 
 		{
+			$_name = $name;
 			if (self::$verbose == TRUE)
 				print("Constructed: " . $this . PHP_EOPL);
 		}
@@ -76,6 +77,7 @@
 						print_r($elems);
 						foreach ($elems as $or)
 						{
+
 							if ($status === NULL)
 								$status = FALSE;
 							else if ($status == TRUE)
