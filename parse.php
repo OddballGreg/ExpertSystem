@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?PHP
+require_once "Fact.class.php";
 if ($argc == 2)
 {
 	if ($argv[1] == NULL | !file_exists($argv[1]))
@@ -15,7 +16,6 @@ if ($argc == 2)
 	$test = count_chars( $test, 3);
 	preg_match_all("/[A-Z]/", $test, $newtest);
 	
-
 	$newarray = array_map('trim', $info[1]);
 	$newarray = array_filter($newarray);
 	$loop = TRUE;
@@ -35,9 +35,11 @@ if ($argc == 2)
 	}
 	array_shift($query);
 	array_shift($initial_facts);
-	print_r($newtest); //debug: shows each unique value
+	//print_r($newtest); //debug: shows each unique value
 	print_r($newarray); //debug to shows rules
 	print_r($query); //debug to shows the ?query
 	print_r($initial_facts); //debug to shows given true values
-}
+	$unique_values = array_combine($newtest[0], $newtest[0]);
+	print_r($unique_values);
+	}
 ?>
