@@ -58,8 +58,36 @@
 				$status = NULL;
 				foreach ($_anull as $rule)
 				{
-					$elems = explode(" ", $rule);
+					$elems = explode("=>", $rule);
+					if (self::$verbose == TRUE)
+					{
+						print("Fact " . $this . "'s rule exploded on the => operater to provide :" . PHP_EOL);
+						print_r($elems);
+					}
+					$elems = explode("<", $elems[0]);
+					if (self::$verbose == TRUE)
+					{
+						print("Fact " . $this . "'s rule exploded on the < operater to provide :" . PHP_EOL);
+						print_r($elems);
+					}
+					$elems = explode("|", $elems[0]);
+					if (self::$verbose == TRUE)
+					{
+						print("Fact " . $this . "'s rule exploded on the | operater to provide :" . PHP_EOL);
+						print_r($elems);
+					}
+					$index = -1;
+					while ($elems[++$index])
+					{
+						$elems[$index] = explode("+", $elems[$index]);
+					}
+					if (self::$verbose == TRUE)
+					{
+						print("Fact " . $this . "'s rule exploded on the + operater to provide :" . PHP_EOL);
+						print_r($elems);
+					}
 					//Prove each element, then check following symbols to determine how to proceed
+
 				}
 			}
 		}
