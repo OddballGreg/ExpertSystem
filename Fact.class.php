@@ -70,22 +70,70 @@
 						print_r($elems);
 					$index = -1;
 					while ($elems[++$index])
+							$elems[$index] = explode("+", $elems[$index]);
+					print("Fact " . $this . "'s rule exploded on the + operater to provide :" . PHP_EOL);
+					print_r($elems);
+					foreach ($elems as $or)
 					{
-						$elems[$index] = explode("+", $elems[$index]);
-					}
-						print("Fact " . $this . "'s rule exploded on the + operater to provide :" . PHP_EOL);
-						print_r($elems);
-						foreach ($elems as $or)
+						$results;
+						foreach ($or as $and)
 						{
-
+							$resolution = 0;
+							foreach ($and as $item)
+							{
+								if ($facts[$item]->prove($facts) === TRUE)
+									$resolution++;
+							}
+							if ($resolution == count($and))
+							$results[] = FALSE;
+						}
+						if (in_array(FALSE, $results) == TRUE)
+						{
 							if ($status === NULL)
 								$status = FALSE;
 							else if ($status == TRUE)
 								$status = FALSE;
 						}
-
-
-
+					}
+				}
+				foreach ($_depend as $rule)
+				{
+					$elems = explode("=>", $rule);
+						print("Fact " . $this . "'s rule exploded on the => operater to provide :" . PHP_EOL);
+						print_r($elems);
+					$elems = explode("<", $elems[0]);
+						print("Fact " . $this . "'s rule exploded on the < operater to provide :" . PHP_EOL);
+						print_r($elems);
+					$elems = explode("|", $elems[0]);
+						print("Fact " . $this . "'s rule exploded on the | operater to provide :" . PHP_EOL);
+						print_r($elems);
+					$index = -1;
+					while ($elems[++$index])
+						$elems[$index] = explode("+", $elems[$index]);
+					print("Fact " . $this . "'s rule exploded on the + operater to provide :" . PHP_EOL);
+					print_r($elems);
+					foreach ($elems as $or)
+					{
+						$results;
+						foreach ($or as $and)
+						{
+							$resolution = 0;
+							foreach ($and as $item)
+							{
+								if ($facts[$item]->prove($facts) === TRUE)
+									$resolution++;
+							}
+							if ($resolution == count($and))
+							$results[] = TRUE;
+						}
+						if (in_array(TRUE, $results) == TRUE)
+						{
+							if ($status === NULL)
+								$status = TRUE;
+							else if ($status == FALSE)
+								$status = "UNDETERMINED";
+						}
+					}
 				}
 				//check dependencies
 				if ($status === NULL)
