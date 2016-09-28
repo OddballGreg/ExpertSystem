@@ -35,11 +35,10 @@ if ($argc == 2)
 	}
 	array_shift($query);
 	array_shift($initial_facts);
-	//print_r($newtest); //debug: shows each unique value
 	print_r($newarray); //debug to shows rules
 	print_r($query); //debug to shows the ?query
 	print_r($initial_facts); //debug to shows given true values
 	$unique_values = array_combine($newtest[0], $newtest[0]);
 	print_r($unique_values);
-	}
+}
 ?>
