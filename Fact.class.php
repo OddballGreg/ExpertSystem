@@ -5,7 +5,7 @@
 
 		/* Variables */
 
-		static public $verbose = 1;
+		static public $verbose = TRUE;
 		private $_name = NULL;
 		private $_depend = NULL;
 		private $_anull = NULL;
@@ -58,9 +58,42 @@
 				$status = NULL;
 				foreach ($_anull as $rule)
 				{
-					$elems = explode(" ", $rule);
-					//Prove each element, then check following symbols to determine how to proceed
+					$elems = explode("=>", $rule);
+						print("Fact " . $this . "'s rule exploded on the => operater to provide :" . PHP_EOL);
+						print_r($elems);
+					$elems = explode("<", $elems[0]);
+						print("Fact " . $this . "'s rule exploded on the < operater to provide :" . PHP_EOL);
+						print_r($elems);
+					$elems = explode("|", $elems[0]);
+						print("Fact " . $this . "'s rule exploded on the | operater to provide :" . PHP_EOL);
+						print_r($elems);
+					$index = -1;
+					while ($elems[++$index])
+					{
+						$elems[$index] = explode("+", $elems[$index]);
+					}
+						print("Fact " . $this . "'s rule exploded on the + operater to provide :" . PHP_EOL);
+						print_r($elems);
+						foreach ($elems as $or)
+						{
+							if ($status === NULL)
+								$status = FALSE;
+							else if ($status == TRUE)
+								$status = FALSE;
+						}
+
+
+
 				}
+				//check dependencies
+				if ($status === NULL)
+					return (FALSE);
+				else if ($status === FALSE)
+					return (FALSE);
+				else if ($status === TRUE)
+					return (TRUE);
+				else
+					return ("UNDETERMINED");
 			}
 		}
 
