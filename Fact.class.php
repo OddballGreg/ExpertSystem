@@ -7,23 +7,23 @@
 
 		static public $verbose = TRUE;
 		private $_name = NULL;
-		private $_depend = NULL;
-		private $_anull = NULL;
+		private $_depend = array();
+		private $_anull = array();
 		private $_constant = FALSE;
 
 		/*Standard Basic Methods*/
 		
 		function __construct($name) 
 		{
-			$_name = $name;
+			$this->_name = $name;
 			if (self::$verbose == TRUE)
-				print("Constructed: " . $this . PHP_EOPL);
+				print("Constructed: " . $this . PHP_EOL);
 		}
 
 		public function __destruct() 
 		{
 			if (self::$verbose == TRUE)
-				print("Destructed: " . $this . PHP_EOPL);
+				print("Destructed: " . $this . PHP_EOL);
 		}
 
 		public function __toString() 
@@ -44,20 +44,22 @@
 		{
 			if (self::$verbose == TRUE)
 			{
-				print("Attempting to prove Fact " . $this . "using the following conditions:" . PHP_EOL);
+				print("Attempting to prove Fact " . $this . " using the following conditions:" . PHP_EOL);
 				foreach ($facts as $fact)
 					print($fact . PHP_EOL);
+				unset($fact);
 			}
 			if ($this->_constant == TRUE)
 			{
 				if (self::$verbose == TRUE)
-					print("Fact " . $this . "Proven TRUE as it is a Constant." . PHP_EOL);
-					return (TRUE);
+					print("Fact " . $this . " Proven TRUE as it is a Constant." . PHP_EOL);
+				return (TRUE);
 			}
 			else
 			{
 				$status = NULL;
-				foreach ($_anull as $rule)
+				print_r($this->_anull);
+				foreach ($this->_anull as $rule)
 				{
 					$elems = explode("=>", $rule);
 						print("Fact " . $this . "'s rule exploded on the => operater to provide :" . PHP_EOL);
@@ -65,12 +67,23 @@
 					$elems = explode("<", $elems[0]);
 						print("Fact " . $this . "'s rule exploded on the < operater to provide :" . PHP_EOL);
 						print_r($elems);
-					$elems = explode("|", $elems[0]);
+					$elems = array(explode("|", $elems[0]));
 						print("Fact " . $this . "'s rule exploded on the | operater to provide :" . PHP_EOL);
 						print_r($elems);
 					$index = -1;
-					while ($elems[++$index])
-							$elems[$index] = explode("+", $elems[$index]);
+					foreach ($elems as $array)
+					{
+						$index = -1;
+						while ($array[++$index])
+							$array[$index] = array(explode("+", $array[0]));
+					}
+					unset($array);
+					foreach ($elems as $array)
+					{
+						$array = array_map('trim' , $array);
+					}
+					unset ($array);
+					unset($item);
 					print("Fact " . $this . "'s rule exploded on the + operater to provide :" . PHP_EOL);
 					print_r($elems);
 					foreach ($elems as $or)
@@ -96,7 +109,8 @@
 						}
 					}
 				}
-				foreach ($_depend as $rule)
+				print_r($this->_depend);
+				foreach ($this->_depend as $rule)
 				{
 					$elems = explode("=>", $rule);
 						print("Fact " . $this . "'s rule exploded on the => operater to provide :" . PHP_EOL);
@@ -108,13 +122,15 @@
 						print("Fact " . $this . "'s rule exploded on the | operater to provide :" . PHP_EOL);
 						print_r($elems);
 					$index = -1;
-					while ($elems[++$index])
-						$elems[$index] = explode("+", $elems[$index]);
+					foreach ($elems as $item)
+							$item = explode("+", $item);
+					unset($item);
+					$elems = array_map('trim' , $elems);
 					print("Fact " . $this . "'s rule exploded on the + operater to provide :" . PHP_EOL);
 					print_r($elems);
 					foreach ($elems as $or)
 					{
-						$results;
+						$results = array();
 						foreach ($or as $and)
 						{
 							$resolution = 0;
@@ -150,21 +166,22 @@
 		public function c_anull($string)
 		{
 			if (self::$verbose == TRUE)
-				print($string . "added to the anullment list of " . $this . PHP_EOPL);
+				print($string . " - added to the anullment list of " . $this . PHP_EOL);
 			$this->_anull[] = $string;
 		}
 
 		public function c_depend($string)
 		{
 			if (self::$verbose == TRUE)
-				print($string . "added to the dependency list of " . $this . PHP_EOPL);
-			$this->_depend[] = $string;
+				print($string . " - added to the dependency list of " . $this . PHP_EOL);
+			$this->_depend[0] = $string;
+			print($string . " -----\n ");
 		}
 
 		public function set_constant()
 		{
 			if (self::$verbose == TRUE)
-				print($this . "was made a constant and will always resolve to TRUE" . PHP_EOPL);
+				print($this . " was made a constant and will always resolve to TRUE" . PHP_EOL);
 			$this->_constant = TRUE;
 		}
 	}
