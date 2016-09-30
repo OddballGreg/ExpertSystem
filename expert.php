@@ -63,18 +63,21 @@ if ($argc == 2)
 	}
 	echo "\n"; //debuggery and other wizard shit
 
-	print_r($rule_array[1]);
-	print_r($depend_array[1]);
-
+	print_r($rule_array[1]);//debuggery and other wizard shit
+	print_r($depend_array[1]);//debuggery and other wizard shit
+	$counter = count($rule_array[1]);
 	$i = 0;
-	while ($i < 10)////debuggery and other wizard shit test value
+	
+	while ($i < $counter)
 	{
 		$tmp = $rule_array[1][$i];
 		$dep = $depend_array[1][$i];
-
+		echo $tmp . "\n";
 		$facts[$tmp]->c_depend($dep);
 		$i++;
 	}
+	echo ($tmp . "\n");
+
 	$facts['V']->c_anull("E + F => !V");
 	$facts['C']->c_anull("E + F => !C");
 	print_r($facts);
