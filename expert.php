@@ -71,14 +71,16 @@ if ($argc == 2)
 	while ($i < $counter)
 	{
 		$tmp = $rule_array[1][$i];
+		$tmp = trim($tmp);
 		$dep = $depend_array[1][$i];
+		echo gettype($tmp) . " ";
 		echo $tmp . "\n";
+		echo $dep . "\n";
 		$facts[$tmp]->c_depend($dep);
 		$i++;
 	}
 	echo ($tmp . "\n");
 
-<<<<<<< HEAD
 	$facts['A']->set_constant();
 	$facts['B']->set_constant();
 	$facts['G']->set_constant();
@@ -86,8 +88,6 @@ if ($argc == 2)
 	$facts['C']->c_depend("A | F => C");
 	$facts['D']->c_depend("A + B + C => D");
 	$facts['H']->c_depend("C | !G => H");
-=======
->>>>>>> edd38ac1abd73c40a561b6c665af6f207972bf00
 	$facts['V']->c_anull("E + F => !V");
 	$facts['C']->c_anull("E + F => !C");
 	print_r($facts);

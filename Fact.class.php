@@ -30,9 +30,8 @@
 
 		public function __toString() 
 		{
-			//if (self::$verbose == TRUE)
-			//	return ();
-			return ($this->_name . ": " . $_avgtruth . " TRUE.\n");
+			$this->calc_avg();
+			return ($this->_name . ": " . $this->_avgtruth . "% TRUE\n");
 		}
 
 		public static function doc() 
@@ -42,14 +41,36 @@
 
 		/* Class Specific Methods */
 
+		private function calc_avg()
+		{
+			if ($this->_constant == TRUE)
+				$this->_avgtruth = 100;
+			else if (count($this->_results) != 0)
+				$this->_avgtruth = array_sum($this->_results) / count($this->_results);
+			else
+				$this->_avgtruth = 0;
+		}
+
 		public function get_prob()
 		{
-			return ($_avgtruth);
+			return ($this->_avgtruth);
 		}
 
 		public function prove($facts)
 		{
-			
+			if (self::$verbose == TRUE)
+			{
+				print("Attempting to prove Fact " . $this . " using the following conditions:" . PHP_EOL);
+				foreach ($facts as $fact)
+					print($fact . PHP_EOL);
+				unset($fact);
+			}
+			if ($this->_constant == TRUE)
+			{
+				if (self::$verbose == TRUE)
+					print("Fact " . $this . " Proven TRUE as it is a Constant." . PHP_EOL);
+				return (TRUE);
+			}
 		}
 
 	/*	public function prove($facts) 
