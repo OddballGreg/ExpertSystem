@@ -31,7 +31,7 @@
 		public function __toString() 
 		{
 			$this->calc_avg();
-			return ($this->_name . ": " . $this->_avgtruth . "% TRUE\n");
+			return ($this->_name . ": " . $this->_avgtruth . "% TRUE\n  ");
 		}
 
 		public static function doc() 

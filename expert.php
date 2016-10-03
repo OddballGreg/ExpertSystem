@@ -9,8 +9,6 @@ if ($argc < 0)
 else if ($argc > 2)
 	print ("This Expert System can only handle one arguement .txt file at a time.\n");
 
-require_once "Fact.class.php";
-
 if ($argc == 2)
 {
 	if ($argv[1] == NULL | !file_exists($argv[1]))
@@ -18,9 +16,76 @@ if ($argc == 2)
 		echo "Error: File does not exist\n";
 		exit(0);
 	}
-	$file = file_get_contents($argv[1]);
+
+	$file = file($argv[1]);
+	print_r($file); //debug
+	$rule_array;
+	$constant_array;
+	$query_array;
+	foreach($file as $line)
+	{
+		preg_match("/([^#]+[<=> ]..+)#/", $line, $rule); // Will blatantly ignore the #symbol if vaild code is after it.
+		if ($rule == NULL)
+			preg_match("/(.+[<=> ]{2,3}[^\w].+)/", $line, $rule);
+		if ($rule != NULL)
+			$rule_array[] = $rule[1];
+	}
+	unset($line);
+	foreach($file as $line)
+	{
+		preg_match("/=([A-Z]+)/", $line, $constant); // Test for only '=' given to define constants
+		if ($constant != NULL)
+		{
+			$constant_a[] = explode(' ', $constant[1])[0];
+			$constant_array = str_split($constant_a[0]);
+		}
+	}
+	unset($line);
+	foreach($file as $line)
+	{
+		preg_match("/\?(.*)/", $line, $query);
+		if ($query != NULL)
+		{
+			$query_a[] = explode(' ', $query[1])[0];
+			$query_array = str_split($query_a[0]);
+		}
+	}
+	unset($line);
+	print_r($rule_array);
+	print_r($constant_array);
+	print_r($query_array);
+
+	$fact_list = $rule_array;
+	$waiting_list = NULL;
+	while($fact_list != NULL)
+	{
+		foreach ($fact_list as $rule)
+		{
+			if(strpos($rule, "<=>") === TRUE)
+			{
+				$temp = explode('<=>', $rule);
+				$fact_list[] = $temp[1] . '=>' . $temp[0];
+				$fact_list[] = $temp[0] . '=>' . $temp[1];
+			}
+			else
+			{
+				$lhs = explode("=>", $rule)[0];
+				$rhs = explode("=>", $rule)[1];
+				preg_match_all("/([A-Z])/", $lhs, $deps);
+				preg_match_all("/([A-Z])/", $rhs, $affs);
+				print_r($affs[1]);
+				print_r($deps[1]);
+			}
+			
+		}
+		print_r($fact_list); // DEBUG
+		$fact_list = $waiting_list;
+	}
+
+
+/*	$file = file_get_contents($argv[1]);
 	preg_match_all('/(.+?)[#$]/', $file, $info);
-	preg_match_all("/=> (.+?)#/", $file, $rule_array);
+	preg_match_all("/=> (.+?)#/", $file, $affectant_array);
 	preg_match_all("/(.+?)=>/", $file, $depend_array);
 	$values = implode(" ", $info[1]);;
 	preg_match_all("/[A-Z]/", $values, $newvalues);
@@ -55,11 +120,11 @@ if ($argc == 2)
 	print_r($unique_values);
 	foreach ($unique_values as $fact)
 	{
-		$facts[$fact] = new Fact($fact);
+		$facts[$fact] = 0;
 	}
 	echo "\n";//debuggery and other wizard shit
 	foreach ($initial_facts as $elem) {
-		$facts[$elem]->set_constant();
+		$facts[$elem] = 100;
 	}
 	echo "\n"; //debuggery and other wizard shit
 
@@ -73,36 +138,16 @@ if ($argc == 2)
 		$tmp = $rule_array[1][$i];
 		$tmp = trim($tmp);
 		$dep = $depend_array[1][$i];
-		echo gettype($tmp) . " ";
-		echo $tmp . "\n";
-		echo $dep . "\n";
-		$facts[$tmp]->c_depend($dep);
+		echo "Affectant " . $tmp . "\n";
+		echo "Dependecy " .  $dep . "\n\n";
 		$i++;
 	}
 	echo ($tmp . "\n");
 
-	$facts['A']->set_constant();
-	$facts['B']->set_constant();
-	$facts['G']->set_constant();
-	$facts['C']->c_depend("A | B => C");
-	$facts['C']->c_depend("A | F => C");
-	$facts['D']->c_depend("A + B + C => D");
-	$facts['H']->c_depend("C | !G => H");
-	$facts['V']->c_anull("E + F => !V");
-	$facts['C']->c_anull("E + F => !C");
 	print_r($facts);
-	$facts['G']->prove($facts);
-	$facts['C']->prove($facts);
+	print_r($affectant_array);
+	print_r($depend_array);
+
+	*/
 }
-//File handling done here.
-
-//Validate File here
-
-//Create objects based off of file input here
-
-//Parse query here and fufill it using the objects created
-
-//Print strings of query results and reasoning here
-
-//exit
 ?>
