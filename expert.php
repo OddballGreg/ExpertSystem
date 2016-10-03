@@ -59,7 +59,7 @@ if ($argc == 2)
 	$facts['B']->set_constant();
 	$facts['G']->set_constant();
 	$facts['C']->c_depend("A | B => C");
-		$facts['C']->c_depend("A | F => C");
+	$facts['C']->c_depend("A | F => C");
 	$facts['D']->c_depend("A + B + C => D");
 	$facts['H']->c_depend("C | !G => H");
 	$facts['V']->c_anull("E + F => !V");

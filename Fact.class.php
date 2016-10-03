@@ -7,9 +7,11 @@
 
 		static public $verbose = TRUE;
 		private $_name = NULL;
+		private $_constant = FALSE;
 		private $_depend = array();
 		private $_anull = array();
-		private $_constant = FALSE;
+		private $_results = array();
+		private $_avgtruth = 0;
 
 		/*Standard Basic Methods*/
 		
@@ -30,7 +32,7 @@
 		{
 			//if (self::$verbose == TRUE)
 			//	return ();
-			return ($this->_name);
+			return ($this->_name . ": " . $_avgtruth . " TRUE.\n");
 		}
 
 		public static function doc() 
@@ -40,7 +42,17 @@
 
 		/* Class Specific Methods */
 
-		public function prove($facts) 
+		public function get_prob()
+		{
+			return ($_avgtruth);
+		}
+
+		public function prove($facts)
+		{
+			
+		}
+
+	/*	public function prove($facts) 
 		{
 			if (self::$verbose == TRUE)
 			{
@@ -161,7 +173,7 @@
 				else
 					return ("UNDETERMINED");
 			}
-		}
+		} */
 
 		public function c_anull($string)
 		{
@@ -175,7 +187,6 @@
 			if (self::$verbose == TRUE)
 				print($string . " - added to the dependency list of " . $this . PHP_EOL);
 			$this->_depend[0] = $string;
-			print($string . " -----\n ");
 		}
 
 		public function set_constant()
