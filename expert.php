@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-
+require_once("libft_core.php");
 require_once("resolution.php");
 
 ini_set('display_errors', true);
@@ -91,7 +91,7 @@ if ($argc == 2)
 	{
 		foreach ($fact_list as $rule)
 		{
-			if(strpos($rule, "<=>") !== FALSE)
+			if(contains($rule, "<=>"))
 			{
 				$temp = explode('<=>', $rule);
 				$fact_list[] = trim($temp[1]) . ' => ' . trim($temp[0]);
@@ -104,15 +104,18 @@ if ($argc == 2)
 				$rhs = explode("=>", $rule)[1];
 				preg_match_all("/([A-Z])/", $lhs, $deps);
 				preg_match_all("/([A-Z])/", $rhs, $affs);
+				echo "Affectants: ";
 				print_r($affs[1]);
+				echo "\nDepenendents: ";
 				print_r($deps[1]);
+				echo "\n";
 				echo ("lhs = " . $lhs . "\n" . "rhs = " . $rhs . "\n");
 				foreach ($fact_list as $rule) // Possible that rules may define constants which are required to solve. additional check to be added.
 				{
 					foreach ($deps[1] as $dep)
 					{
 						$check = explode("=>", $rule)[1];
-						if (strpos($check, $dep) !== FALSE)
+						if (contains($check, $dep))
 							$push = TRUE;
 					}
 				}
@@ -123,7 +126,7 @@ if ($argc == 2)
 						foreach ($deps[1] as $dep)
 						{
 							$check = explode("=>", $rule)[1];
-							if (strpos($check, $dep) !== FALSE)
+							if (contains($check, $dep))
 								$push = TRUE;
 						}
 					}
@@ -137,7 +140,6 @@ if ($argc == 2)
 					print_r($facts);
 					print_r($rhs);
 					if ($facts[trim($brackets[1][0])] === TRUE)
-						//$facts[trim($rhs)][] = 100;
 						assign_prob($fact_list, trim($rhs), 100);
 					else
 						$facts[trim($rhs)][] = $facts[trim($brackets[1])];
