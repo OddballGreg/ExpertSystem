@@ -1,6 +1,8 @@
 #!/usr/bin/php
 <?php
 
+require_once("resolution.php");
+
 ini_set('display_errors', true);
 error_reporting(E_ALL);
 
@@ -17,8 +19,11 @@ if ($argc == 2)
 		exit(0);
 	}
 
+
+	//File read and parse
+
 	$file = file($argv[1]);
-	print_r($file); //debug
+	//print_r($file); //debug
 	$rule_array;
 	$constant_array;
 	$query_array;
@@ -51,9 +56,34 @@ if ($argc == 2)
 		}
 	}
 	unset($line);
+	$factsn = array();
+	$facts = array();
+	foreach($rule_array as $line)
+	{
+		preg_match_all("/([A-Z]{1})/", $line, $ufact);
+		$factsn = array_merge($factsn, $ufact[1]);
+		$factsn = array_unique($factsn);
+		foreach($factsn as $fact)
+		{
+			$facts[$fact] = array();
+		}
+		unset($fact);
+	}
+	unset($line);
+	foreach ($constant_array as $constant)
+		$facts[$constant] = TRUE;
+	unset($line);
+	echo "Rules\n";
 	print_r($rule_array);
+	echo "Constants\n";
 	print_r($constant_array);
+	echo "Queries\n";
 	print_r($query_array);
+	echo "Facts\n";
+	print_r($facts);
+	echo "\n";
+
+	//Solving
 
 	$fact_list = $rule_array;
 	$waiting_list = NULL;
@@ -61,24 +91,62 @@ if ($argc == 2)
 	{
 		foreach ($fact_list as $rule)
 		{
-			if(strpos($rule, "<=>") === TRUE)
+			if(strpos($rule, "<=>") !== FALSE)
 			{
 				$temp = explode('<=>', $rule);
-				$fact_list[] = $temp[1] . '=>' . $temp[0];
-				$fact_list[] = $temp[0] . '=>' . $temp[1];
+				$fact_list[] = trim($temp[1]) . ' => ' . trim($temp[0]);
+				$fact_list[] = trim($temp[0]) . ' => ' . trim($temp[1]);
 			}
 			else
 			{
+				$push = FALSE;
 				$lhs = explode("=>", $rule)[0];
 				$rhs = explode("=>", $rule)[1];
 				preg_match_all("/([A-Z])/", $lhs, $deps);
 				preg_match_all("/([A-Z])/", $rhs, $affs);
 				print_r($affs[1]);
 				print_r($deps[1]);
+				echo ("lhs = " . $lhs . "\n" . "rhs = " . $rhs . "\n");
+				foreach ($fact_list as $rule) // Possible that rules may define constants which are required to solve. additional check to be added.
+				{
+					foreach ($deps[1] as $dep)
+					{
+						$check = explode("=>", $rule)[1];
+						if (strpos($check, $dep) !== FALSE)
+							$push = TRUE;
+					}
+				}
+				if ($waiting_list != NULL)
+				{
+					foreach ($waiting_list as $rule)
+					{
+						foreach ($deps[1] as $dep)
+						{
+							$check = explode("=>", $rule)[1];
+							if (strpos($check, $dep) !== FALSE)
+								$push = TRUE;
+						}
+					}
+				}
+				if ($push === TRUE)
+					$waiting_list[] = $rule;
+				else
+				{
+					preg_match_all('/\(((?:[^()])*)\)/', $rule, $brackets);
+					print_r($brackets[1]);
+					print_r($facts);
+					print_r($rhs);
+					if ($facts[trim($brackets[1][0])] === TRUE)
+						//$facts[trim($rhs)][] = 100;
+						assign_prob($fact_list, trim($rhs), 100);
+					else
+						$facts[trim($rhs)][] = $facts[trim($brackets[1])];
+				}
 			}
 			
 		}
 		print_r($fact_list); // DEBUG
+		print_r($facts);
 		$fact_list = $waiting_list;
 	}
 
@@ -118,10 +186,7 @@ if ($argc == 2)
 	print_r($initial_facts); ////debuggery and other wizard shit to shows given true values
 	$unique_values = array_combine($newtest[0], $newtest[0]);
 	print_r($unique_values);
-	foreach ($unique_values as $fact)
-	{
-		$facts[$fact] = 0;
-	}
+	
 	echo "\n";//debuggery and other wizard shit
 	foreach ($initial_facts as $elem) {
 		$facts[$elem] = 100;
