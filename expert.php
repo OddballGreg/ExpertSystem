@@ -140,7 +140,7 @@ if ($argc == 2)
 					print_r($facts);
 					print_r($rhs);
 					if ($facts[trim($brackets[1][0])] === TRUE)
-						assign_prob($fact_list, trim($rhs), 100);
+						assign_prob_and($fact_list, trim($rhs), 100);
 					else
 						$facts[trim($rhs)][] = $facts[trim($brackets[1])];
 				}
