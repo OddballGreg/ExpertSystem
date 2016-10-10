@@ -58,7 +58,9 @@ if ($argc == 2)
 	unset($line);
 	$factsn = array();
 	$facts = array();
-	foreach($rule_array as $line)
+
+	//below code will generate facts only according to those used in the defined rules
+	/*foreach($rule_array as $line)
 	{
 		preg_match_all("/([A-Z]{1})/", $line, $ufact);
 		$factsn = array_merge($factsn, $ufact[1]);
@@ -69,7 +71,15 @@ if ($argc == 2)
 		}
 		unset($fact);
 	}
-	unset($line);
+	unset($line);*/
+
+	//generate all possible facts
+	$chars = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	foreach ($chars as $char)
+	{
+		$facts[$char] = array();
+	}
+	//Define constants in a fact array as boolean true rather than arrays
 	foreach ($constant_array as $constant)
 		$facts[$constant] = TRUE;
 	unset($line);
