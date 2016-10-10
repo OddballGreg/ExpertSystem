@@ -27,11 +27,15 @@ function resolve_exp($fact_list, $expression)
 	//solve the lower brackets and reinsert the results into the string
 	foreach ($brackets[1] as $single_exp)
 	{
-		
+		while (contains($single_exp, "+"))
+		{
+			preg_match("/([^\+ ]* \+ [^\+ ]*)/", $single_exp, $solve);
+			
+		}
 	}
 
 
-	//resolve & operations, reinsert result
+	//resolve + operations, reinsert result
 
 	//resolve | opeartions, reinsert result
 
