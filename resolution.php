@@ -11,6 +11,15 @@ function assign_prob_or($fact_list, $keys, $prob)
 	foreach ($keys as $key)
 		$fact_list[$key] = $prob / count($keys);
 }
+    
+    function $rhs_probs($rhs) {
+        if (strpos($rhs, "+") !== false) {
+            $rhs2 = str_replace("+", " ", $rhs);
+            $rhs2 = str_replace(" ", "", $rhs2);
+            $len = strlen($rhs2);
+            echo "The length minus + is " . $len;
+        }
+    }
 
 function resolve_exp($fact_list, $expression)
 {

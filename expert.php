@@ -24,6 +24,7 @@ if ($argc == 2)
 
 	$file = file($argv[1]);
 	//print_r($file); //debug
+    $rhs_array;
 	$rule_array;
 	$constant_array;
 	$query_array;
@@ -32,8 +33,9 @@ if ($argc == 2)
 		preg_match("/([^#]+[<=> ]..+)#/", $line, $rule); // Will blatantly ignore the #symbol if vaild code is after it.
 		if ($rule == NULL)
 			preg_match("/(.+[<=> ]{2,3}[^\w].+)/", $line, $rule);
-		if ($rule != NULL)
+        if ($rule != NULL) {
 			$rule_array[] = $rule[1];
+        }
 	}
 	unset($line);
 	foreach($file as $line)
@@ -56,6 +58,7 @@ if ($argc == 2)
 		}
 	}
 	unset($line);
+    
 	$factsn = array();
 	$facts = array();
 
@@ -83,7 +86,7 @@ if ($argc == 2)
 	foreach ($constant_array as $constant)
 		$facts[$constant] = TRUE;
 	unset($line);
-	echo "Rules\n";
+	echo "\nRules\n";
 	print_r($rule_array);
 	echo "Constants\n";
 	print_r($constant_array);
@@ -93,10 +96,26 @@ if ($argc == 2)
 	print_r($facts);
 	echo "\n";
 
+    /******************** Splitting rhs *********************/
+    /*
+    $i = 0;
+    foreach ($rule_array as $elem) {
+        echo ($elem . "\n");
+        $rule = substr($elem, strpos($elem, ">") + 1);
+        $rhs_array[$i] = $rule;
+        $i++;
+    }
+    
+    
+    print_r($rhs_array);
+    */
+    /************************ END ***************************/
+    
 	//Solving
 
 	$fact_list = $rule_array;
 	$waiting_list = NULL;
+    
 	while($fact_list != NULL)
 	{
 		foreach ($fact_list as $rule)
@@ -112,14 +131,29 @@ if ($argc == 2)
 				$push = FALSE;
 				$lhs = explode("=>", $rule)[0];
 				$rhs = explode("=>", $rule)[1];
-				preg_match_all("/([A-Z])/", $lhs, $deps);
+                				preg_match_all("/([A-Z])/", $lhs, $deps);
 				preg_match_all("/([A-Z])/", $rhs, $affs);
+                
+                /******************** TESTING PHASE *********************/
+                
+               // $dep_keys = array_combine($deps[1], $deps[1]);
+               // $aff_keys = array_combine($affs[1], $affs[1]);
 				echo "Affectants: ";
 				print_r($affs[1]);
 				echo "\nDepenendents: ";
 				print_r($deps[1]);
 				echo "\n";
 				echo ("lhs = " . $lhs . "\n" . "rhs = " . $rhs . "\n");
+            
+                if (strpos($rhs, "+") !== false) {
+                    $rhs2 = str_replace("+", " ", $rhs);
+                    $rhs2 = str_replace(" ", "", $rhs2);
+                    $len = strlen($rhs2);
+    
+                }
+                
+                /******************** END TESTING PHASE *********************/
+                
 				foreach ($fact_list as $rule) // Possible that rules may define constants which are required to solve. additional check to be added.
 				{
 					foreach ($deps[1] as $dep)
@@ -159,9 +193,13 @@ if ($argc == 2)
 		}
 		print_r($fact_list); // DEBUG
 		print_r($facts);
+        print_r($waiting_list);
 		$fact_list = $waiting_list;
+        exit(0);
 	}
 
+    
+    /*************************** old parse function ****************************/
 
 /*	$file = file_get_contents($argv[1]);
 	preg_match_all('/(.+?)[#$]/', $file, $info);
@@ -224,7 +262,8 @@ if ($argc == 2)
 	print_r($facts);
 	print_r($affectant_array);
 	print_r($depend_array);
+ */
+ /****************************** end of old parse function **************************/
 
-	*/
 }
 ?>
