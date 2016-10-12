@@ -29,21 +29,31 @@ function resolve_exp($fact_list, $expression)
 				preg_replace($lower_exp, $result, $expression);
 			}
 	} while ($brackets != NULL);
-
 	$expression = str_replace(array('(',')'), '', $expression);
+
+	//solve or sets last by breaking on them first
 	$or_sets = explode("|", $expression);
-
-	//resolve + operations, reinsert result
-
-	//resolve | opeartions, reinsert result
-
-	//resolve ^ operations, resinsert result
-
-	//repeat the above steps until no further bracket sets can be obtained or operations run
-
-	//return result
-
-	return (0);
+	//resolve + operations
+	foreach ($or_sets as $set)
+	{
+		$and_set = explode("+", $set);
+		foreach ($and_set as $item)
+		{
+			if (!contains($item, "^"))
+				$results[] = trim($item); 
+			else
+			{
+				$xor_set = explode("^", $item);
+				if (count($xor_set) > 2)
+					die("XOR rule over-complicated. Cannot parse exclusivity for more than 2 facts" . PHP_EOL);
+				$results[] = ( (cap((100 - trim($xor_set[1]) + trim($xor_set[0])), 100) / 2) + 
+							   (cap((100 - trim($xor_set[0]) + trim($xor_set[1])), 100) / 2) ) / 2;
+			}
+		}
+		$or_results[] = max($result);
+	}
+	$end_prob = (min($or_results) + sum($or_results) / count($or_results)) / 2;
+	return ($end_prob);
 }
 
 function resolve_rule($fact_list, $rule)
@@ -73,7 +83,7 @@ function resolve_rule($fact_list, $rule)
 
 	//call resolve_exp on expression
 	$probablility = resolve_exp($fact_list, $expression);
-	
+
 	//Allocate returned expression probablitiy to $fact_list according to the array created earlier
 }
 

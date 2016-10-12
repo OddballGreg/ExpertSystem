@@ -7,4 +7,11 @@ function contains($haystack, $needle)
 	return (TRUE);
 }
 
+function cap($value, $cap)
+{
+	if ($value > $cap)
+		return ($cap);
+	return ($value);
+}
+
 ?>
