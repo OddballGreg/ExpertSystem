@@ -11,15 +11,17 @@ function assign_prob_or($fact_list, $keys, $prob)
 	foreach ($keys as $key)
 		$fact_list[$key] = $prob / count($keys);
 }
-    
-    function $rhs_probs($rhs) {
-        if (strpos($rhs, "+") !== false) {
-            $rhs2 = str_replace("+", " ", $rhs);
-            $rhs2 = str_replace(" ", "", $rhs2);
-            $len = strlen($rhs2);
-            echo "The length minus + is " . $len;
-        }
-    }
+
+function resolve_rhs($rhs) 
+{
+	if (strpos($rhs, "+") !== false) 
+	{
+		$rhs2 = str_replace("+", " ", $rhs);
+		$rhs2 = str_replace(" ", "", $rhs2);
+		$len = strlen($rhs2);
+		echo "The length minus + is " . $len;
+	}
+}
 
 function resolve_exp($fact_list, $expression)
 {
@@ -72,6 +74,7 @@ function resolve_rule($fact_list, $rule)
 
 	//create array for affectants dictating probablitiy allocation
 	$affectant = $sides[1];
+	$allocation = resolve_rhs($affectant);
 
 	//replace expression FACTS with their related probablities from $fact_list in the string itself
 	$expression = $sides[0];
@@ -94,6 +97,9 @@ function resolve_rule($fact_list, $rule)
 	$probablility = resolve_exp($fact_list, $expression);
 
 	//Allocate returned expression probablitiy to $fact_list according to the array created earlier
+	foreach ($chars as $fact)
+		if (array_key_exists($fact, $allocation))
+			$fact_list[$fact][] = $probablility * ($allocations[$fact] / 100);
 }
 
 ?>
