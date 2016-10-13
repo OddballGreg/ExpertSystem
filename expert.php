@@ -19,7 +19,6 @@ if ($argc == 2)
 		exit(0);
 	}
 
-
 	//File read and parse
 
 	$file = file($argv[1]);
@@ -116,11 +115,11 @@ if ($argc == 2)
 	$fact_list = $rule_array;
 	$waiting_list = NULL;
     
-	while($fact_list != NULL)
+	while($fact_list != NULL) //Loop runs through the fact list infinitely to make sure all rules are used.
 	{
 		foreach ($fact_list as $rule)
 		{
-			if(contains($rule, "<=>"))
+			if(contains($rule, "<=>")) //create singular sub rules from <=>
 			{
 				$temp = explode('<=>', $rule);
 				$fact_list[] = trim($temp[1]) . ' => ' . trim($temp[0]);
@@ -154,16 +153,16 @@ if ($argc == 2)
                 
                 /******************** END TESTING PHASE *********************/
                 
-				foreach ($fact_list as $rule) // Possible that rules may define constants which are required to solve. additional check to be added.
+				foreach ($fact_list as $rule) // Check for fact dependencies in remaining rules
 				{
 					foreach ($deps[1] as $dep)
 					{
 						$check = explode("=>", $rule)[1];
-						if (contains($check, $dep))
-							$push = TRUE;
+						if (contains($check, trim($dep)) && $fact_list[trim($dep)] != TRUE) // Forces the rule to be pushed to the next list if it's listed dependencies have not been fully defined and are not constants
+							$push = TRUE; //Variable sets this rule to be pushed to the next list.
 					}
 				}
-				if ($waiting_list != NULL)
+				if ($waiting_list != NULL) // Check for fact dependencies in rules already pushed to the waiting list.
 				{
 					foreach ($waiting_list as $rule)
 					{
@@ -176,9 +175,13 @@ if ($argc == 2)
 					}
 				}
 				if ($push === TRUE)
-					$waiting_list[] = $rule;
-				else
+					$waiting_list[] = $rule; // Pushes the rule to the waiting list for the next runthrough
+				else // Resolve the rule
 				{
+
+					/***************************************************************************** 
+					This code would solve a singular expression rule, even if brackets. eg (C) => E
+
 					preg_match_all('/\(((?:[^()])*)\)/', $rule, $brackets);
 					print_r($brackets[1]);
 					print_r($facts);
@@ -186,7 +189,8 @@ if ($argc == 2)
 					if ($facts[trim($brackets[1][0])] === TRUE)
 						assign_prob_and($fact_list, trim($rhs), 100);
 					else
-						$facts[trim($rhs)][] = $facts[trim($brackets[1])];
+						$facts[trim($rhs)][] = $facts[trim($brackets[1])]; 
+					******************************************************************************/
 				}
 			}
 			
