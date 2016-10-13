@@ -1,15 +1,15 @@
 <?php
 
-function assign_prob_and($fact_list, $keys, $prob)	
+function assign_prob_and($facts, $keys, $prob)	
 {
 	foreach ($keys as $key)
-		$fact_list[$key] = $prob;
+		$facts[$key] = $prob;
 }
 
-function assign_prob_or($fact_list, $keys, $prob)
+function assign_prob_or($facts, $keys, $prob)
 {
 	foreach ($keys as $key)
-		$fact_list[$key] = $prob / count($keys);
+		$facts[$key] = $prob / count($keys);
 }
 
 function resolve_rhs($rhs) 
@@ -23,7 +23,7 @@ function resolve_rhs($rhs)
 	}
 }
 
-function resolve_exp($fact_list, $expression)
+function resolve_exp($facts, $expression)
 {
 	do 
 	{
@@ -35,7 +35,7 @@ function resolve_exp($fact_list, $expression)
 		if ($brackets != NULL)
 			foreach ($brackets[1] as $lower_exp)
 			{
-				$result = resolve_exp($fact_list, $lower_exp);
+				$result = resolve_exp($facts, $lower_exp);
 				$lower_exp = preg_quote($lower_exp, "/");
 				preg_replace($lower_exp, $result, $expression);
 			}
@@ -67,7 +67,7 @@ function resolve_exp($fact_list, $expression)
 	return ($end_prob);
 }
 
-function resolve_rule($fact_list, $rule)
+function resolve_rule($facts, $rule)
 {
 	//split expression from affectants
 	$sides = explode("=>", $rule);
@@ -76,30 +76,30 @@ function resolve_rule($fact_list, $rule)
 	$affectant = $sides[1];
 	$allocation = resolve_rhs($affectant);
 
-	//replace expression FACTS with their related probablities from $fact_list in the string itself
+	//replace expression FACTS with their related probablities from $facts in the string itself
 	$expression = $sides[0];
 	$chars = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	foreach ($chars as $fact)
 	{
 		$pattern = "/\!" . $fact . "/";
-		if ($fact_list[$fact] !== TRUE)
-			$expression = preg_replace($pattern, (100 - sum($fact_list[$fact]) / count($fact_list[$fact])), $expression);
+		if ($facts[$fact] !== TRUE)
+			$expression = preg_replace($pattern, (100 - sum($facts[$fact]) / count($facts[$fact])), $expression);
 		else
 			$expression = preg_replace($pattern, "0", $expression);
 		$pattern = "/" . $fact . "/";
-		if ($fact_list[$fact] !== TRUE)
-			$expression = preg_replace($pattern, sum($fact_list[$fact]) / count($fact_list[$fact]), $expression);
+		if ($facts[$fact] !== TRUE)
+			$expression = preg_replace($pattern, sum($facts[$fact]) / count($facts[$fact]), $expression);
 		else
 			$expression = preg_replace($pattern, "100", $expression);
 	}
 
 	//call resolve_exp on expression
-	$probablility = resolve_exp($fact_list, $expression);
+	$probablility = resolve_exp($facts, $expression);
 
-	//Allocate returned expression probablitiy to $fact_list according to the array created earlier
+	//Allocate returned expression probablitiy to $facts according to the array created earlier
 	foreach ($chars as $fact)
 		if (array_key_exists($fact, $allocation))
-			$fact_list[$fact][] = $probablility * ($allocations[$fact] / 100);
+			$facts[$fact][] = $probablility * ($allocation[$fact] / 100);
 }
 
 ?>

@@ -112,18 +112,18 @@ if ($argc == 2)
     
 	//Solving
 
-	$fact_list = $rule_array;
+	$rule_list = $rule_array;
 	$waiting_list = NULL;
     
-	while($fact_list != NULL) //Loop runs through the fact list infinitely to make sure all rules are used.
+	while($rule_list != NULL) //Loop runs through the fact list infinitely to make sure all rules are used.
 	{
-		foreach ($fact_list as $rule)
+		foreach ($rule_list as $rule)
 		{
 			if(contains($rule, "<=>")) //create singular sub rules from <=>
 			{
 				$temp = explode('<=>', $rule);
-				$fact_list[] = trim($temp[1]) . ' => ' . trim($temp[0]);
-				$fact_list[] = trim($temp[0]) . ' => ' . trim($temp[1]);
+				$rule_list[] = trim($temp[1]) . ' => ' . trim($temp[0]);
+				$rule_list[] = trim($temp[0]) . ' => ' . trim($temp[1]);
 			}
 			else
 			{
@@ -153,12 +153,12 @@ if ($argc == 2)
                 
                 /******************** END TESTING PHASE *********************/
                 
-				foreach ($fact_list as $rule) // Check for fact dependencies in remaining rules
+				foreach ($rule_list as $rule) // Check for fact dependencies in remaining rules
 				{
 					foreach ($deps[1] as $dep)
 					{
 						$check = explode("=>", $rule)[1];
-						if (contains($check, trim($dep)) && $fact_list[trim($dep)] != TRUE) // Forces the rule to be pushed to the next list if it's listed dependencies have not been fully defined and are not constants
+						if (contains($check, trim($dep)) && $facts[trim($dep)] != TRUE) // Forces the rule to be pushed to the next list if it's listed dependencies have not been fully defined and are not constants
 							$push = TRUE; //Variable sets this rule to be pushed to the next list.
 					}
 				}
@@ -178,6 +178,7 @@ if ($argc == 2)
 					$waiting_list[] = $rule; // Pushes the rule to the waiting list for the next runthrough
 				else // Resolve the rule
 				{
+					resolve_rule($rule_list, $rule);
 
 					/***************************************************************************** 
 					This code would solve a singular expression rule, even if brackets. eg (C) => E
@@ -187,7 +188,7 @@ if ($argc == 2)
 					print_r($facts);
 					print_r($rhs);
 					if ($facts[trim($brackets[1][0])] === TRUE)
-						assign_prob_and($fact_list, trim($rhs), 100);
+						assign_prob_and($rule_list, trim($rhs), 100);
 					else
 						$facts[trim($rhs)][] = $facts[trim($brackets[1])]; 
 					******************************************************************************/
@@ -195,10 +196,10 @@ if ($argc == 2)
 			}
 			
 		}
-		print_r($fact_list); // DEBUG
+		print_r($rule_list); // DEBUG
 		print_r($facts);
         print_r($waiting_list);
-		$fact_list = $waiting_list;
+		$rule_list = $waiting_list;
         exit(0);
 	}
 
