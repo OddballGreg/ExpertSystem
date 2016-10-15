@@ -16,9 +16,10 @@ function resolve_rhs($rhs)
 		$brackets = NULL;
 		preg_match_all('/\(((?:[^()])*)\)/', $rhs, $brackets);
 		print_r($brackets);
-		$bracket_sets = array_merge($bracket_sets, $brackets[1]);
-		while ($bracket_sets[++$index] != NULL)
-			str_replace($bracket_sets[$index], $index, $rhs);
+        $bracket_sets = array_merge($bracket_sets, $brackets[1]);
+        if ($bracket_sets != NULL)
+		    while ($bracket_sets[++$index] != NULL)
+		    	str_replace($bracket_sets[$index], $index, $rhs);
 	} while ($brackets[0] != NULL);
 	if (strlen(trim($rhs)) == 1)
 		$dispersal[trim($rhs)] = 100;
@@ -28,30 +29,36 @@ function resolve_rhs($rhs)
 	{
 		if (strlen(trim($set)) == 1)
 			$dispersal[trim($set)] = 100;
-		else
-			$or_sets = preg_split("/[\|\^]/", $set);
+        else
+        {
+            $or_sets = preg_split("/[\|\^]/", $set);
 			foreach ($or_sets as $or)
 			{
 				$dispersal[trim($set)] = 100 / count($or_sets);
-			}
+            }
+        }
 	}
 	echo("dealing with brackets" . PHP_EOL);
-	$index = -1;
-	while ($bracket_sets[++$index] != NULL)
-	{
-		$plus_sets = explode("+", $bracket_sets[$index]);
-		foreach ($plus_sets as $set)
-		{
-			if (strlen(trim($set)) == 1)
-				$dispersal[trim($set)] = $disperal[$index];
-			else
-				$or_sets = preg_split("/[\|\^]/", $set);
-			foreach ($or_sets as $or)
-			{
-				$dispersal[trim($set)] = $disperal[$index] / count($or_sets);
-			}
-		}
-	}
+    $index = -1;
+    if ($bracket_sets != NULL)
+    {
+	    while ($bracket_sets[++$index] != NULL)
+    	{
+    		$plus_sets = explode("+", $bracket_sets[$index]);
+    		foreach ($plus_sets as $set)
+    		{
+    			if (strlen(trim($set)) == 1)
+    				$dispersal[trim($set)] = $disperal[$index];
+    			else
+    				$or_sets = preg_split("/[\|\^]/", $set);
+    			foreach ($or_sets as $or)
+    			{
+    				$dispersal[trim($set)] = $disperal[$index] / count($or_sets);
+    			}
+    		}
+    	}
+    }
+	echo("Returning Dispersal" . PHP_EOL);
 	return ($dispersal);
 }
 
@@ -64,14 +71,17 @@ function resolve_exp($facts, $expression)
 		preg_match_all('/\(((?:[^()])*)\)/', $expression, $brackets);
 
 		//solve the lower brackets and reinsert the results into the string
-		if ($brackets != NULL)
+	    print_r($brackets);
+		if (count($brackets[0]) != 0)
 			foreach ($brackets[1] as $lower_exp)
 			{
 				$result = resolve_exp($facts, $lower_exp);
-				$lower_exp = preg_quote($lower_exp, "/");
+                $lower_exp = "/" . preg_quote($lower_exp, "/") . "/";
+                echo ($lower_exp) . PHP_EOL;
 				preg_replace($lower_exp, $result, $expression);
 			}
-	} while ($brackets != NULL);
+	} while (count($brackets[0]) != 0);
+	echo("resolve_exp dowhile loop ended" . PHP_EOL);
 	$expression = str_replace(array('(',')'), '', $expression);
 
 	//solve or sets last by breaking on them first
@@ -93,9 +103,9 @@ function resolve_exp($facts, $expression)
 							   (cap((100 - trim($xor_set[0]) + trim($xor_set[1])), 100) / 2) ) / 2;
 			}
 		}
-		$or_results[] = max($result);
+		$or_results[] = max($results);
 	}
-	$end_prob = (min($or_results) + sum($or_results) / count($or_results)) / 2;
+	$end_prob = (min($or_results) + array_sum($or_results) / count($or_results)) / 2;
 	return ($end_prob);
 }
 
@@ -111,9 +121,12 @@ function resolve_rule($facts, $rule)
 	//replace expression FACTS with their related probablities from $facts in the string itself
 	$expression = $sides[0];
 	$chars = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	echo("Replacing expression FACTS with related probs" . PHP_EOL);
 	foreach ($chars as $fact)
-	{
-		if (array_key_exists($fact, $facts))
+    {
+        echo ("Checking if $fact is in facts" . PHP_EOL);
+        print_r ($facts);
+        if (array_key_exists($fact, $facts))
 		{
 			$pattern = "/\!" . $fact . "/";
 			if ($facts[$fact] !== TRUE && $facts[$fact] != NULL)
@@ -127,11 +140,14 @@ function resolve_rule($facts, $rule)
 				$expression = preg_replace($pattern, "100", $expression);
 		}
 	}
+	echo($expression . PHP_EOL);
 
 	//call resolve_exp on expression
+	echo("Resolving Expression" . PHP_EOL);
 	$probablility = resolve_exp($facts, $expression);
 
 	//Allocate returned expression probablitiy to $facts according to the array created earlier
+	echo("Allocating Probability" . PHP_EOL);
 	foreach ($chars as $fact)
 		if (array_key_exists($fact, $allocation))
 			$facts[$fact][] = $probablility * ($allocation[$fact] / 100);
