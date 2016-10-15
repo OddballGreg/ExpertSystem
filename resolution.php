@@ -72,13 +72,17 @@ function resolve_exp($facts, $expression)
 
 		//solve the lower brackets and reinsert the results into the string
 	    print_r($brackets);
+            echo ("brackets count =" . count($brackets[0]) . PHP_EOL);
 		if (count($brackets[0]) != 0)
 			foreach ($brackets[1] as $lower_exp)
 			{
+                echo ("Lower expression before preg_quote and resolve_exp = " . $lower_exp . PHP_EOL);
 				$result = resolve_exp($facts, $lower_exp);
-                $lower_exp = "/" . preg_quote($lower_exp, "/") . "/";
-                echo ($lower_exp) . PHP_EOL;
-				preg_replace($lower_exp, $result, $expression);
+                $lower_exp = "/\(" . preg_quote($lower_exp, "/") . "\)/";
+                echo ("Result = " . $result . PHP_EOL);
+                echo ("Lower expression = " . $lower_exp . PHP_EOL);
+                $expression = preg_replace($lower_exp, $result, $expression);
+                echo ($expression . PHP_EOL);
 			}
 	} while (count($brackets[0]) != 0);
 	echo("resolve_exp dowhile loop ended" . PHP_EOL);
@@ -106,6 +110,7 @@ function resolve_exp($facts, $expression)
 		$or_results[] = max($results);
 	}
 	$end_prob = (min($or_results) + array_sum($or_results) / count($or_results)) / 2;
+    echo ("End_prob before return: " . $end_prob . PHP_EOL);
 	return ($end_prob);
 }
 
@@ -150,7 +155,9 @@ function resolve_rule($facts, $rule)
 	echo("Allocating Probability" . PHP_EOL);
 	foreach ($chars as $fact)
 		if (array_key_exists($fact, $allocation))
-			$facts[$fact][] = $probablility * ($allocation[$fact] / 100);
+            $facts[$fact][] = $probablility * ($allocation[$fact] / 100);
+
+    return ($facts);
 }
 
 ?>

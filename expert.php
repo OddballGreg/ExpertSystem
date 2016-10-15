@@ -178,7 +178,7 @@ if ($argc == 2)
 					$waiting_list[] = $rule; // Pushes the rule to the waiting list for the next runthrough
 				else // Resolve the rule
 				{
-					resolve_rule($facts, $rule);
+					$facts = resolve_rule($facts, $rule);
 
 					/***************************************************************************** 
 					This code would solve a singular expression rule, even if brackets. eg (C) => E
