@@ -123,14 +123,21 @@ if ($argc == 2)
 			{
 				$temp = explode('<=>', $rule);
 				$rule_list[] = trim($temp[1]) . ' => ' . trim($temp[0]);
-				$rule_list[] = trim($temp[0]) . ' => ' . trim($temp[1]);
+                $rule_list[] = trim($temp[0]) . ' => ' . trim($temp[1]);
+                echo "<=> subrules created" . PHP_EOL;
+                $tmp_key = array_search($rule, $rule_list);
+                echo "array search for $rule found $tmp_key" . PHP_EOL;
+                unset($rule_list[$tmp_key]);
+                echo "rule_list : ";
+                print_r($rule_list);
+                $push = FALSE;
 			}
 			else
 			{
 				$push = FALSE;
 				$lhs = explode("=>", $rule)[0];
 				$rhs = explode("=>", $rule)[1];
-                				preg_match_all("/([A-Z])/", $lhs, $deps);
+               	preg_match_all("/([A-Z])/", $lhs, $deps);
 				preg_match_all("/([A-Z])/", $rhs, $affs);
                 
                 /******************** TESTING PHASE *********************/
@@ -153,11 +160,15 @@ if ($argc == 2)
                 
                 /******************** END TESTING PHASE *********************/
                 
-				foreach ($rule_list as $rule) // Check for fact dependencies in remaining rules
+				foreach ($rule_list as $rule_check) // Check for fact dependencies in remaining rules
 				{
+                    $tmp_key = array_search($rule, $rule_list);
+                    echo "array search for $rule found $tmp_key" . PHP_EOL;
+                    if (array_search($rule_check, $rule_list) < $tmp_key + 1)
+                        break;
 					foreach ($deps[1] as $dep)
 					{
-						$check = explode("=>", $rule)[1];
+						$check = explode("=>", $rule_check)[1];
 						if (contains($check, trim($dep)) && $facts[trim($dep)] != TRUE) // Forces the rule to be pushed to the next list if it's listed dependencies have not been fully defined and are not constants
 							$push = TRUE; //Variable sets this rule to be pushed to the next list.
 					}
@@ -174,34 +185,46 @@ if ($argc == 2)
 						}
 					}
 				}
-				if ($push === TRUE)
-					$waiting_list[] = $rule; // Pushes the rule to the waiting list for the next runthrough
+                if ($push === TRUE)
+                {
+                    $waiting_list[] = $rule; // Pushes the rule to the waiting list for the next runthrough
+                    $push = FALSE;
+                }
 				else // Resolve the rule
 				{
 					$facts = resolve_rule($facts, $rule);
-
-					/***************************************************************************** 
-					This code would solve a singular expression rule, even if brackets. eg (C) => E
-
-					preg_match_all('/\(((?:[^()])*)\)/', $rule, $brackets);
-					print_r($brackets[1]);
-					print_r($facts);
-					print_r($rhs);
-					if ($facts[trim($brackets[1][0])] === TRUE)
-						assign_prob_and($rule_list, trim($rhs), 100);
-					else
-						$facts[trim($rhs)][] = $facts[trim($brackets[1])]; 
-					******************************************************************************/
 				}
 			}
 			
-		}
+        }
+        echo "Rule list :";
 		print_r($rule_list); // DEBUG
+        echo PHP_EOL . "Facts list :";
 		print_r($facts);
+        echo PHP_EOL . "Waiting list :";
         print_r($waiting_list);
+        echo PHP_EOL;
 		$rule_list = $waiting_list;
-        exit(0);
-	}
+    }
+
+    foreach ($query_array as $query)
+    {
+        if ($facts[$query] === TRUE)
+            echo "$query is TRUE" . PHP_EOL;
+        else if ($facts[$query] != NULL)
+        {
+            $final_prob = array_sum($facts[$query]) / count($facts[$query]);
+            if ($final_prob > 50)
+                echo "$query is TRUE" . PHP_EOL;
+            else if ($final_prob < 50)
+                echo "$query is FALSE" . PHP_EOL;
+            else
+                echo "$query is UNDETERMINED" . PHP_EOL;
+        }
+        else
+            echo "$query is FALSE" . PHP_EOL;
+
+    }
 
     
     /*************************** old parse function ****************************/

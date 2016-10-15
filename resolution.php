@@ -130,7 +130,6 @@ function resolve_rule($facts, $rule)
 	foreach ($chars as $fact)
     {
         echo ("Checking if $fact is in facts" . PHP_EOL);
-        print_r ($facts);
         if (array_key_exists($fact, $facts))
 		{
 			$pattern = "/\!" . $fact . "/";
